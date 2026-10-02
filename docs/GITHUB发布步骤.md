@@ -102,7 +102,7 @@ git push -u origin main
 ## 完整命令（复制粘贴版）
 
 ```bash
-cd C:/Users/ycylg/WorkBuddy/2026-09-30-18-49-11/vpn-share
+cd <你的项目路径>/vpn-share
 
 git remote add origin https://github.com/chanyi217/VpnShare.git
 git branch -M main
