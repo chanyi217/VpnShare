@@ -181,20 +181,14 @@ user.name  = chanyi217
 user.email = chanyi217@users.noreply.github.com
 ```
 
-> **隐私提醒**：仓库一旦 Public，commit 里的邮箱会被**永久公开**，
-> 且 GitHub 网页、git log、`git clone` 都能看到，爬虫专门抓这个发垃圾邮件。
+> **为什么用 noreply 邮箱**：仓库一旦 Public，commit 里的邮箱会被**永久公开**
+> （GitHub 网页、git log、clone 都能看到），爬虫专门抓这个发垃圾邮件。
+> noreply 地址同样能关联到 GitHub 账号（头像、主页跳转都在），但不暴露真实邮箱。
 >
-> 不想暴露真实邮箱就换成 GitHub 的 noreply 地址（同样能关联头像和主页跳转）：
+> 配套设置：GitHub → Settings → **Emails** → 勾上 `Keep my email addresses private`。
 >
-> ```bash
-> git config user.email "chanyi217@users.noreply.github.com"
-> ```
->
-> 保险起见，建议顺手在 GitHub → Settings → **Emails** 里勾上
-> `Keep my email addresses private`。
->
-> 上面这些只保存在本地 Git 配置里，**不在**仓库中，不会上传。
-> 但**已经写进 commit 的邮箱会**随仓库公开，所以要在 push 之前决定好用哪个。
+> 注意：这个身份保存在**本地 Git 配置**里，不会随仓库上传；
+> 但**写进 commit 的邮箱会**公开，所以要在 push 之前定好用哪个。
 
 ## 想加协作者 / 换电脑
 
