@@ -1,0 +1,77 @@
+# ============================================================
+# VpnShare — 需要排除的文件
+#
+# 原则：仓库只放「源码 + 文档 + 最终产物」，
+#       所有构建缓存、虚拟环境、本地配置、密钥都不上传。
+# ============================================================
+
+# ---------------- Android ----------------
+# Gradle 构建产物（每个模块几十 MB，且可随时重建）
+# 注意：Gradle 是**多模块**结构，每个模块都有独立的 build/，
+#       只写 android-app/build/ 会漏掉 android-app/app/build/（700+ 个中间文件）。
+#       用通配把根工程和所有模块的构建目录一次性排除。
+android-app/build/
+android-app/*/build/
+android-app/.gradle/
+android-app/.idea/
+android-app/local.properties
+android-app/captures/
+*.aab
+
+# APK：默认全部排除（构建过程的中间产物也落在各处），
+# 但 apk/ 与 pc-gui/release/ 下的**发布产物**要保留——
+# 这两个目录的意义就是"不看源码也能直接下载使用"。
+*.apk
+!apk/*.apk
+# 历史旧版本不进仓库，只留最新的
+apk/旧版本-勿用/
+apk/VpnShare-v1.0.apk
+apk/VpnShare-v1.1.apk
+
+# ★ 签名密钥：绝不上传
+#   发布 APK 用的是自签名测试证书，但密码属于凭据，不进仓库。
+#   需要签名时在本地创建 keystore.properties（见 build.gradle.kts 注释）
+android-app/keystore/
+android-app/keystore.properties
+*.jks
+*.keystore
+
+# ---------------- Python / PC 端 ----------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# 构建虚拟环境（50MB+，用 requirements 重建即可）
+pc-gui/.venv/
+venv/
+env/
+
+# PyInstaller 中间产物（build/ 136MB、dist/ 93MB，都可重建）
+pc-gui/build/
+pc-gui/dist/
+# 带时间戳的打包输出目录（每次构建生成一个，几十 MB）
+pc-gui/dist_*/
+pc-gui/*.spec
+
+# ---------------- 日志与运行时文件 ----------------
+*.log
+boot.log
+error.log
+
+# adb dump 出来的临时 UI 快照
+ui*.xml
+
+# ---------------- 系统与编辑器 ----------------
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# ============================================================
+# 注意：以下目录**故意保留**（要随仓库分发）
+#   apk/          —— 已构建的发布版 APK
+#   pc-gui/release/ —— 已打包的 Windows exe
+#   这样不看源码的人也能直接下载使用。
+# ============================================================

@@ -1,0 +1,23 @@
+# 统一换行符：仓库内一律存 LF，检出时按平台转换
+# 本项目主要在 Windows 上开发，但源码交给 Gradle / Python 处理时 LF 更安全。
+* text=auto eol=lf
+
+# 必须保持 LF 的脚本（bash / shell 遇到 CRLF 会报 "bad interpreter"）
+*.sh        text eol=lf
+*.py        text eol=lf
+*.kts       text eol=lf
+*.gradle    text eol=lf
+
+# Windows 批处理 / PowerShell 必须用 CRLF
+*.bat       text eol=crlf
+*.ps1       text eol=crlf
+*.cmd       text eol=crlf
+
+# 二进制：禁止任何转换，否则文件损坏
+*.apk       binary
+*.exe       binary
+*.jar       binary
+*.ico       binary
+*.png       binary
+*.jks       binary
+*.keystore  binary
