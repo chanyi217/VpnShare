@@ -23,17 +23,46 @@
    因为本地已经有 README / .gitignore / LICENSE 了，勾了会冲突，push 会被拒。
 4. 点 **Create repository**。
 5. 创建完页面会显示一个地址，形如：
-   ```
-   https://github.com/你的用户名/VpnShare.git
-   ```
+```
+https://github.com/chanyi217/VpnShare.git
+```
    **把这行复制下来**，下一步要用。
 
-### 第 2 处：命令行登录 —— 第一次 push 时的身份认证
+### 第 2 处：第一次 push —— 弹浏览器登录
 
-GitHub **早在 2021 年就停用了「账号密码」认证**，所以 push 时密码框里
-**填你的登录密码一定会失败**。必须用 **Personal Access Token（PAT）**。
+这台机器装了 **Git Credential Manager 2.9.0**（随 PortableGit 带的），所以不需要手动生成 Token：
+push 的时候会自动**弹一个 GitHub 授权网页**，在网页里用 `chanyi217` + 密码登录、点 Authorize 就行。
+登录一次之后 Windows 会记住，以后 push 不再问。
 
-**生成 Token：**
+```bash
+git remote add origin https://github.com/chanyi217/VpnShare.git
+git branch -M main
+git push -u origin main
+```
+
+执行后会发生什么：
+
+```
+> git push -u origin main
+# 弹出浏览器 → GitHub 登录页
+#   用户名: chanyi217
+#   密码:   你的 GitHub 登录密码
+# 登录后点绿色的 "Authorize GitCredentialManager"
+# 终端显示 Writing objects: 100% ... done
+```
+
+> ⚠️ **别在终端的黑框里输密码。** 真正的 Git push **不支持**账号密码直连
+> （GitHub 2021 年就停用了），在命令行 paste 密码会报：
+> `remote: Support for password authentication was removed`。
+> 只有**浏览器那个网页**能用密码，或者用下面的 Token 兜底。
+
+---
+
+## 兜底方案 B：手动生成 Token
+
+只在**浏览器没弹出来**时才用这条路（比如远程桌面、无图形会话）。
+
+### 生成 Token
 
 1. 登录 github.com → 右上角头像 → **Settings**
 2. 左侧最下面 → **Developer settings**
@@ -46,47 +75,41 @@ GitHub **早在 2021 年就停用了「账号密码」认证**，所以 push 时
 6. 点 **Generate token**
 7. ⚠️ **Token 只显示这一次**，立刻复制保存（形如 `ghp_xxxxxxxxxxxxxxxxxxxx`）
 
-**最简单的一次性做法 —— 把 Token 塞进远程地址（不用记，也不用配凭据管理器）：**
+### 用法一：塞进远程地址（免交互，推荐自用）
 
 ```bash
-git remote add origin https://你的用户名:ghp_你的Token@github.com/你的用户名/VpnShare.git
+git remote add origin https://chanyi217:ghp_你的Token@github.com/chanyi217/VpnShare.git
 git branch -M main
 git push -u origin main
 ```
 
-这样 push 直接成功，不会再弹登录框。
-（代价：Token 明文存在 `.git/config` 里，自用机器无所谓；介意的话看下面「备选」。）
+push 直接成功，不再弹任何框。
+代价：Token 明文存在 `.git/config` 里 —— 自用机器无所谓，但**这个文件绝不能外传**。
 
-**备选 —— 让 Windows 记住凭据：**
+### 用法二：让凭据管理器记住
 
 ```bash
-git remote add origin https://github.com/你的用户名/VpnShare.git
+git remote add origin https://github.com/chanyi217/VpnShare.git
 git branch -M main
 git push -u origin main
 ```
 
-第一次 push 会弹 Windows 凭据窗口 / 浏览器授权页：
-- 用户名：你的 GitHub 用户名
-- **密码：粘贴上面那个 Token**（不是登录密码）
-
+弹凭据窗口时：用户名填 `chanyi217`，**密码栏粘贴 Token**（不是登录密码）。
 之后 Windows 凭据管理器会记住，再 push 就不用输了。
-
-> 如果报错 `remote: Support for password authentication was removed...`，
-> 说明你填的是登录密码而不是 Token，重来一遍即可。
 
 ---
 
 ## 完整命令（复制粘贴版）
 
-把 `你的用户名` 和 `ghp_你的Token` 换成实际值：
-
 ```bash
 cd C:/Users/ycylg/WorkBuddy/2026-09-30-18-49-11/vpn-share
 
-git remote add origin https://你的用户名:ghp_你的Token@github.com/你的用户名/VpnShare.git
+git remote add origin https://github.com/chanyi217/VpnShare.git
 git branch -M main
 git push -u origin main
 ```
+
+终端跑完这三行 → 浏览器自动弹出 → 用 `chanyi217` + 密码登录 → 点 Authorize → 完事。
 
 push 完刷新仓库页面，应该能看到 README 渲染出来的首页。
 
@@ -149,25 +172,43 @@ curl https://www.google.com   # 不通 → 确认是 fake-IP
 
 ---
 
-## 提交身份（可选）
+## 提交身份
 
-首次 commit 用的是仓库级占位身份。想换成你自己的名字：
+已经配好了，不用管：
 
-```bash
-git config user.name  "你的名字"
-git config user.email "你的邮箱"
-git commit --amend --reset-author --no-edit
-git push -f origin main
+```
+user.name  = chanyi217
+user.email = chanyi217@users.noreply.github.com
 ```
 
-> `--amend` 会改写历史，只在**还没人 clone 你的仓库**时这么做才安全。
+用的是 **GitHub noreply 邮箱**，好处是能正确关联到你的 GitHub 账号（头像、主页跳转都在），
+但真实邮箱不会明文暴露在网页上挨爬虫抓。
+
+## 想加协作者 / 换电脑
+
+```bash
+git clone https://github.com/chanyi217/VpnShare.git
+```
+
+仓库里**没有** keystore 和构建缓存，clone 下来直接 `./gradlew assembleRelease` 会退回 debug 签名，
+自用没问题。要正式签名参见 `android-app/README.md`。
 
 ---
 
 ## 常见问题
 
+**Q：push 报 `Support for password authentication was removed`**
+A：说明密码是被敲进**终端**的，而不是在浏览器网页里输的。Git 协议不支持密码，
+只在网页 OAuth 登录时用。先清掉缓存的凭据再重试：
+
+```bash
+git credential-manager github logout   # 或 cmdkey /delete:git:https://github.com
+git push -u origin main                # 重来，这次在弹出来的网页里登
+```
+
 **Q：push 报 `Authentication failed`**
-A：密码处填的是登录密码。必须用 PAT（见「第 2 处」）。
+A：浏览器弹窗里登录错了账号，或者没点 Authorize。按上面 logout 后重来。
+实在不行走「兜底方案 B」手动生成 Token。
 
 **Q：push 报 `failed to push some refs`**
 A：建仓库时勾了 README / .gitignore / LICENSE。去网页把仓库删了重建，三个勾都不打。
